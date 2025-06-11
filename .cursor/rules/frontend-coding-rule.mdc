@@ -1,0 +1,350 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Vue3 中規模プロジェクト向け Cursor Rules
+
+## 基本原則
+
+### アーキテクチャの指針
+- **Feature-First Architecture**: 機能単位でモジュールを分割し、高凝集・疎結合を実現
+- **Composition API 優先**: Options API より Composition API を使用し、ロジックの再利用性を高める
+- **TypeScript 必須**: 型安全性を確保し、開発体験を向上
+- **単一責任の原則**: 各コンポーネント・関数は一つの責務のみを持つ
+
+## ディレクトリ構造
+
+```
+src/
+├── features/              # 機能別モジュール
+│   └── {feature}/
+│       ├── components/    # 機能固有のコンポーネント
+│       │   ├── {Component}.vue
+│       │   └── {Component}.spec.ts
+│       ├── composables/   # 機能固有のComposition関数
+│       │   └── use{Feature}.ts
+│       ├── stores/        # 機能固有のPiniaストア
+│       │   └── {feature}Store.ts
+│       ├── types/         # 機能固有の型定義
+│       │   └── index.ts
+│       ├── api/          # API通信層
+│       │   └── {feature}Api.ts
+│       └── index.ts      # Public API
+├── shared/               # 共通モジュール
+│   ├── components/       # 共通UIコンポーネント
+│   ├── composables/      # 共通Composition関数
+│   ├── utils/           # ユーティリティ関数
+│   └── types/           # 共通型定義
+├── router/              # ルーティング設定
+├── stores/              # グローバルストア
+└── App.vue
+```
+
+## コンポーネント設計
+
+### 1. SFC (Single File Component) の構造
+```vue
+<script setup lang="ts">
+// 1. Import文
+import { ref, computed } from 'vue'
+import type { UserData } from '../types'
+
+// 2. Props定義
+interface Props {
+  userId: string
+  initialData?: UserData
+}
+const props = withDefaults(defineProps<Props>(), {
+  initialData: undefined
+})
+
+// 3. Emits定義
+interface Emits {
+  (e: 'update', value: UserData): void
+  (e: 'delete', id: string): void
+}
+const emit = defineEmits<Emits>()
+
+// 4. Composables
+const { userData, isLoading } = useUserData(props.userId)
+
+// 5. リアクティブな状態
+const isEditing = ref(false)
+
+// 6. 算出プロパティ
+const displayName = computed(() => 
+  userData.value?.name || 'Unknown User'
+)
+
+// 7. メソッド
+const handleUpdate = (data: UserData) => {
+  emit('update', data)
+  isEditing.value = false
+}
+</script>
+
+<template>
+  <!-- テンプレート -->
+</template>
+
+<style scoped>
+/* スコープ付きスタイル */
+</style>
+```
+
+### 2. コンポーネントの分類
+
+- **Page Components**: ルートに対応する最上位コンポーネント（`{Feature}Page.vue`）
+- **Container Components**: ビジネスロジックを持つコンポーネント（`{Feature}Container.vue`）
+- **Presentational Components**: 表示専用コンポーネント（`{Feature}View.vue`）
+- **Base Components**: 汎用UIコンポーネント（`Base{Component}.vue`）
+
+## Composables設計
+
+### 基本構造
+
+```typescript
+// composables/useUserManagement.ts
+import { ref, computed, type Ref } from 'vue'
+import type { User } from '../types'
+
+interface UseUserManagementOptions {
+  initialUsers?: User[]
+  autoSave?: boolean
+}
+
+interface UseUserManagementReturn {
+  users: Ref<User[]>
+  selectedUser: Ref<User | null>
+  isLoading: Ref<boolean>
+  addUser: (user: User) => Promise<void>
+  updateUser: (id: string, data: Partial<User>) => Promise<void>
+  deleteUser: (id: string) => Promise<void>
+}
+
+export function useUserManagement(
+  options: UseUserManagementOptions = {}
+): UseUserManagementReturn {
+  const { initialUsers = [], autoSave = false } = options
+  
+  // State
+  const users = ref<User[]>(initialUsers)
+  const selectedUser = ref<User | null>(null)
+  const isLoading = ref(false)
+  
+  // Methods
+  const addUser = async (user: User) => {
+    isLoading.value = true
+    try {
+      // API call
+      users.value.push(user)
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
+  return {
+    users: readonly(users),
+    selectedUser: readonly(selectedUser),
+    isLoading: readonly(isLoading),
+    addUser,
+    updateUser,
+    deleteUser
+  }
+}
+```
+
+## 状態管理（Pinia）
+
+### ストアの設計
+
+```typescript
+// stores/userStore.ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import type { User } from '@/shared/types'
+
+export const useUserStore = defineStore('user', () => {
+  // State
+  const users = ref<User[]>([])
+  const currentUserId = ref<string | null>(null)
+  
+  // Getters
+  const currentUser = computed(() => 
+    users.value.find(u => u.id === currentUserId.value)
+  )
+  
+  const activeUsers = computed(() => 
+    users.value.filter(u => u.isActive)
+  )
+  
+  // Actions
+  async function fetchUsers() {
+    const response = await api.getUsers()
+    users.value = response.data
+  }
+  
+  function setCurrentUser(userId: string) {
+    currentUserId.value = userId
+  }
+  
+  // クリーンアップ
+  function $reset() {
+    users.value = []
+    currentUserId.value = null
+  }
+  
+  return {
+    // State
+    users: readonly(users),
+    currentUserId: readonly(currentUserId),
+    // Getters
+    currentUser,
+    activeUsers,
+    // Actions
+    fetchUsers,
+    setCurrentUser,
+    $reset
+  }
+})
+```
+
+## 命名規則
+
+### ファイル・ディレクトリ
+- **コンポーネント**: PascalCase（`UserProfile.vue`）
+- **Composables**: camelCase with `use` prefix（`useUserData.ts`）
+- **ストア**: camelCase with `Store` suffix（`userStore.ts`）
+- **型定義**: PascalCase（`UserData.ts`）
+- **ユーティリティ**: camelCase（`formatDate.ts`）
+
+### コード内
+- **Props**: camelCase
+- **Emits**: camelCase（動詞で始める）
+- **算出プロパティ**: 名詞/形容詞（`isValid`, `fullName`）
+- **メソッド**: 動詞で始める（`handleClick`, `fetchData`）
+- **定数**: UPPER_SNAKE_CASE
+
+## テスト戦略
+
+### コンポーネントテスト
+
+```typescript
+// components/UserProfile.spec.ts
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import UserProfile from './UserProfile.vue'
+
+describe('UserProfile', () => {
+  it('displays user name correctly', () => {
+    const wrapper = mount(UserProfile, {
+      props: {
+        user: { id: '1', name: 'John Doe' }
+      }
+    })
+    
+    expect(wrapper.text()).toContain('John Doe')
+  })
+  
+  it('emits update event when save button clicked', async () => {
+    const wrapper = mount(UserProfile, {
+      props: {
+        user: { id: '1', name: 'John Doe' }
+      }
+    })
+    
+    await wrapper.find('[data-test="save-button"]').trigger('click')
+    
+    expect(wrapper.emitted('update')).toBeTruthy()
+  })
+})
+```
+
+### Composableテスト
+
+```typescript
+// composables/useCounter.spec.ts
+import { describe, it, expect } from 'vitest'
+import { useCounter } from './useCounter'
+
+describe('useCounter', () => {
+  it('increments counter', () => {
+    const { count, increment } = useCounter()
+    
+    expect(count.value).toBe(0)
+    increment()
+    expect(count.value).toBe(1)
+  })
+})
+```
+
+## パフォーマンス最適化
+
+### 1. コンポーネントの最適化
+```vue
+<script setup lang="ts">
+import { shallowRef, markRaw } from 'vue'
+
+// 大きなオブジェクトにはshallowRefを使用
+const largeData = shallowRef([])
+
+// リアクティブが不要なオブジェクトはmarkRaw
+const chartInstance = markRaw(new ChartLibrary())
+</script>
+```
+
+### 2. 動的インポート
+```typescript
+// router/index.ts
+const routes = [
+  {
+    path: '/admin',
+    component: () => import('@/features/admin/AdminPage.vue')
+  }
+]
+```
+
+## エラーハンドリング
+
+### グローバルエラーハンドラー
+```typescript
+// main.ts
+app.config.errorHandler = (err, instance, info) => {
+  console.error('Global error:', err)
+  // エラー通知サービスに送信
+}
+```
+
+### Composable内でのエラーハンドリング
+```typescript
+export function useApi() {
+  const error = ref<Error | null>(null)
+  const isLoading = ref(false)
+  
+  const fetchData = async () => {
+    error.value = null
+    isLoading.value = true
+    
+    try {
+      const data = await api.getData()
+      return data
+    } catch (e) {
+      error.value = e as Error
+      // 必要に応じて通知
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
+  return {
+    error: readonly(error),
+    isLoading: readonly(isLoading),
+    fetchData
+  }
+}
+```
+
+## まとめ
+
+このルールセットは、Vue3の中規模プロジェクトにおいて、保守性と拡張性を重視した開発を実現します。Feature-Firstアーキテクチャとリーダブルコードの原則に基づき、チーム開発での一貫性を保ちながら、効率的な開発を可能にします。
