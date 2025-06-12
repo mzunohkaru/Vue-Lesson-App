@@ -3,6 +3,8 @@
     <h1>My Task</h1>
     <TaskList
       :tasks="tasks"
+      @task-status-updated="handleTaskStatusUpdate"
+      @task-deletion-requested="handleTaskDeletion"
     />
   </div>
 </template>
@@ -24,6 +26,22 @@ const tasks = ref<Task[]>([
   { id: '3', title: 'タスク3', completed: false },
 ])
 
+/**
+ * タスクの完了状態を更新
+ */
+function handleTaskStatusUpdate(taskId: string, newStatus: boolean): void {
+  const taskIndex = tasks.value.findIndex((task) => task.id === taskId)
+  if (taskIndex !== -1) {
+    tasks.value[taskIndex].completed = newStatus
+  }
+}
+
+/**
+ * タスクを削除
+ */
+function handleTaskDeletion(taskId: string): void {
+  tasks.value = tasks.value.filter((task) => task.id !== taskId)
+}
 </script>
 
 <style scoped></style>
