@@ -14,13 +14,7 @@
 
 <script setup lang="ts">
 import TaskItem from './TaskItem.vue'
-
-// ビジネスエンティティの型定義
-type Task = {
-  readonly id: string
-  title: string
-  completed: boolean
-}
+import type { Task } from '../types/task'
 
 // プロップの定義
 interface Props {

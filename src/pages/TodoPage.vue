@@ -11,14 +11,8 @@
 
 <script setup lang="ts">
 import TaskList from '../components/TaskList.vue'
+import type { Task } from '../types/task'
 import { ref } from 'vue'
-
-// ビジネスエンティティの型定義
-type Task = {
-  readonly id: string
-  title: string
-  completed: boolean
-}
 
 const tasks = ref<Task[]>([
   { id: '1', title: 'タスク1', completed: false },
