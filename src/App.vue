@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watchEffect, watch } from 'vue'
 
 const price = ref(9.99)
 function increasePrice() {
@@ -45,6 +45,17 @@ const evaluation = computed(() => {
   console.log('computed')
   return count.value > 3 ? 'Good' : 'Bad'
 })
+watchEffect(() => {
+  console.log('watchEffect')
+  console.log(count.value)
+})
+watch(count, (newVal, oldVal) => {
+  console.log('watch')
+  console.log(newVal)
+  console.log(oldVal)
+})
+const isRed = ref(true)
+const isBlue = ref(true)
 </script>
 
 <template>
@@ -77,11 +88,22 @@ const evaluation = computed(() => {
 
     <p>Count: {{ count }}</p>
     <input type="text" @keyup.enter="count++" @keyup.space="count++" />
+    <p>Evaluation: {{ evaluation }}</p>
+    <div :class="['red', 'bg-blue']">Red</div>
+    <div :class="{ red: isRed, 'bg-blue': isBlue }">Red</div>
+    <button @click="isRed = !isRed">Red</button>
+    <button @click="isBlue = !isBlue">Blue</button>
+    <div :style="{ color: 'red', fontSize: '20px' }">Red</div>
   </div>
-  <p>Evaluation: {{ evaluation }}</p>
 </template>
 
 <style scoped>
+.red {
+  color: red;
+}
+.bg-blue {
+  background-color: blue;
+}
 h1 {
   color: red;
 }
