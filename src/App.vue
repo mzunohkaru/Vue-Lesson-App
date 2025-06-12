@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
 const price = ref(9.99)
 function increasePrice() {
@@ -13,17 +13,45 @@ const info = ref({
 const info2 = reactive({
   name: 'Ziro',
   age: 20,
-  email: ref('taro@example.com'),
+  email: 'taro@example.com',
   bio: 'hello',
 })
+
+function changeAge(event: MouseEvent) {
+  console.log(event)
+  console.log('Before:', info2)
+  info2.age += 1
+  console.log('After:', info2)
+}
+
 const items = ref(['バナナ', 'apple', 'orange'])
+const googleURL = 'https://www.google.com'
+const vueId = 'vue-id'
+
+function handleSubmit(event: Event) {
+  event.preventDefault()
+  console.log('Form submitted')
+}
+function handleClick() {
+  // event.stopPropagation()
+  console.log('Button clicked')
+}
+function handleSpecialLink(event: Event) {
+  event.preventDefault()
+  console.log('Special link clicked')
+}
+const count = ref(0)
+const evaluation = computed(() => {
+  console.log('computed')
+  return count.value > 3 ? 'Good' : 'Bad'
+})
 </script>
 
 <template>
   <div>
     <h1>Hello {{ info.name }}</h1>
     <h1>{{ info2.bio }} {{ info2.name }}</h1>
-    <button @click="info.name = 'Jiro'">Change Name</button>
+    <button @click="info2.name = 'Jiro'" @mouseover="changeAge">Change Name</button>
     <p>Price: {{ price }}</p>
     <button @click="increasePrice">Increase Price</button>
     <ul>
@@ -32,7 +60,25 @@ const items = ref(['バナナ', 'apple', 'orange'])
     <div>
       {{ price > 10 ? 'high' : 'low' }}
     </div>
+    <a :id="vueId" :href="googleURL" target="_blank">Google</a>
+    <!-- 属性消失 -->
+    <!-- <a :id="undefined" :href=false :target="undefined">Google</a> -->
+    <form @submit.prevent="handleSubmit">
+      <button @click.stop="handleClick">
+        <a @click.prevent.stop="handleSpecialLink"> Google </a>
+      </button>
+    </form>
+
+    <form @submit="handleSubmit">
+      <button @click="handleClick">
+        <a @click="handleSpecialLink"> Google Fake </a>
+      </button>
+    </form>
+
+    <p>Count: {{ count }}</p>
+    <input type="text" @keyup.enter="count++" @keyup.space="count++" />
   </div>
+  <p>Evaluation: {{ evaluation }}</p>
 </template>
 
 <style scoped>
