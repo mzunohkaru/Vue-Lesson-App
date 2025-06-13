@@ -1,7 +1,7 @@
-import LoginPage from '@/pages/LoginPage.vue'
-import NotFoundPage from '@/pages/NotFoundPage.vue'
-import TaskDetailPage from '@/pages/TaskDetailPage.vue'
-import TodoPage from '@/pages/TodoPage.vue'
+import LoginPage from '@/views/LoginPage.vue'
+import NotFoundPage from '@/views/NotFoundPage.vue'
+import TaskDetailPage from '@/views/TaskDetailPage.vue'
+import TodoPage from '@/views/TodoPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/store/useUserStore'
 

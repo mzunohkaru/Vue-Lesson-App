@@ -2,12 +2,12 @@
   <div class="login-container">
     <div class="login-card">
       <h1 class="login-title">{{ title }}</h1>
-      <form @submit.prevent="handleLogin" class="login-form">
+      <form @submit.prevent="viewModel.handleLogin" class="login-form">
         <div class="form-group">
           <label for="email" class="form-label">メールアドレス</label>
           <input
             id="email"
-            v-model="email"
+            v-model="viewModel.email.value"
             type="email"
             class="form-input"
             placeholder="example@email.com"
@@ -18,29 +18,26 @@
           <label for="password" class="form-label">パスワード</label>
           <input
             id="password"
-            v-model="password"
+            v-model="viewModel.password.value"
             type="password"
             class="form-input"
             placeholder="パスワードを入力してください"
             required
           />
         </div>
-        <!-- ヒント表示 -->
         <div class="demo-hint">
           <p><strong>デモ用アカウント:</strong></p>
           <p>Email: tanaka@gmail.com</p>
           <p>Password: SecurePass123!</p>
         </div>
-        <!-- エラーメッセージ表示 -->
-        <div v-if="errorMessage" class="error-message">
-          {{ errorMessage }}
+        <div v-if="viewModel.errorMessage.value" class="error-message">
+          {{ viewModel.errorMessage.value }}
         </div>
-        <!-- 成功メッセージ表示 -->
-        <div v-if="successMessage" class="success-message">
-          {{ successMessage }}
+        <div v-if="viewModel.successMessage.value" class="success-message">
+          {{ viewModel.successMessage.value }}
         </div>
-        <button type="submit" class="login-button" :disabled="isLoading">
-          {{ isLoading ? 'ログイン中...' : 'ログイン' }}
+        <button type="submit" class="login-button" :disabled="viewModel.isLoading.value">
+          {{ viewModel.isLoading.value ? 'ログイン中...' : 'ログイン' }}
         </button>
       </form>
     </div>
@@ -48,97 +45,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/store/useUserStore'
-import { verifyPassword } from '@/utils/crypto'
-import type { UserCredentials } from '@/types/user'
+import { ref } from 'vue'; // Keep for title if it remains static in the view
+import { useLoginViewModel } from '@/viewmodels/loginViewModel';
 
-const title = ref('ログイン')
-const email = ref('')
-const password = ref('')
-const errorMessage = ref('')
-const successMessage = ref('')
-const isLoading = ref(false)
+const title = ref('ログイン'); // This could also be moved to ViewModel if it's dynamic
+const viewModel = useLoginViewModel();
 
-const userStore = useUserStore()
-const router = useRouter()
-
-// セキュアなダミーユーザーデータベース（実際のアプリではAPIから取得）
-// パスワード: SecurePass123! のハッシュ値
-const dummyUsers: UserCredentials[] = [
-  {
-    id: '1',
-    name: '田中 太郎',
-    email: 'tanaka@gmail.com',
-    passwordHash: '3b4cf85d435e3b708d1a9b9cefa427e1ec4cabefa1a5cc4989613fe36dc7c240',
-  },
-]
-
-const handleLogin = async () => {
-  // エラーと成功メッセージをリセット
-  errorMessage.value = ''
-  successMessage.value = ''
-  isLoading.value = true
-
-  try {
-    // 入力値の検証
-    if (!email.value || !password.value) {
-      throw new Error('メールアドレスとパスワードを入力してください')
-    }
-
-    // ローディング演出
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // ユーザー検索
-    const user = dummyUsers.find((u) => u.email === email.value)
-
-    if (!user) {
-      throw new Error('メールアドレスまたはパスワードが正しくありません')
-    }
-
-    // パスワード検証（セキュアなハッシュ比較）
-    const isPasswordValid = await verifyPassword(password.value, user.passwordHash)
-
-    if (!isPasswordValid) {
-      throw new Error('メールアドレスまたはパスワードが正しくありません')
-    }
-
-    // ログイン成功：ストアにユーザー情報を保存（パスワードは除外）
-    userStore.login({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    })
-
-    successMessage.value = `${user.name}さん、ログインしました！`
-
-    // フォームをリセット
-    email.value = ''
-    password.value = ''
-
-    console.log('ログイン成功:', {
-      isAuthenticated: userStore.isAuthenticated,
-      userProfile: userStore.userProfile,
-    })
-
-    // 0.5秒後にTodoページに遷移
-    setTimeout(() => {
-      router.push('/todo')
-    }, 500)
-  } catch (error) {
-    if (error instanceof Error) {
-      errorMessage.value = error.message
-    } else {
-      errorMessage.value = 'ログインに失敗しました'
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
+// All other refs (email, password, errorMessage, etc.) and handleLogin logic
+// are now managed by useLoginViewModel.
 </script>
 
 <style scoped>
+/* Styles remain the same */
 .login-container {
   min-height: 100vh;
   display: flex;
