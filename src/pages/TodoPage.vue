@@ -5,7 +5,7 @@
     <TaskList
       :tasks="tasks"
       @task-status-updated="handleTaskStatusUpdate"
-      @task-deletion-requested="handleTaskDeletion"
+      @task:deletion:requested="handleTaskDeletion"
     />
   </div>
 </template>

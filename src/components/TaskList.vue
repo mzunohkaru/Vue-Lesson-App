@@ -6,7 +6,7 @@
         :title="task.title"
         :is-completed="task.completed"
         @task-status-updated="handleTaskStatusUpdate"
-        @task-deletion-requested="handleTaskDeletion"
+        @task:deletion:requested="handleTaskDeletion"
       />
     </li>
   </ul>
@@ -24,7 +24,7 @@ interface Props {
 // イベントの定義
 interface Emits {
   (e: 'task-status-updated', taskId: string, newStatus: boolean): void
-  (e: 'task-deletion-requested', taskId: string): void
+  (e: 'task:deletion:requested', taskId: string): void
 }
 
 defineProps<Props>()
@@ -41,7 +41,7 @@ function handleTaskStatusUpdate(taskId: string, newCompletionStatus: boolean): v
  * タスクの削除要求イベントを親コンポーネントに委譲
  */
 function handleTaskDeletion(taskId: string): void {
-  emit('task-deletion-requested', taskId)
+  emit('task:deletion:requested', taskId)
 }
 </script>
 

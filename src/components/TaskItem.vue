@@ -54,7 +54,7 @@ type TaskItemProps = {
 // イベントの型定義（より明確な命名）
 type TaskItemEmits = {
   'task-status-updated': [taskId: string, newStatus: boolean]
-  'task-deletion-requested': [taskId: string]
+  'task:deletion:requested': [taskId: string]
 }
 
 const props = defineProps<TaskItemProps>()
@@ -84,7 +84,7 @@ function handleDeletionRequest(): void {
     return
   }
 
-  emit('task-deletion-requested', props.taskId)
+  emit('task:deletion:requested', props.taskId)
 }
 
 /**
