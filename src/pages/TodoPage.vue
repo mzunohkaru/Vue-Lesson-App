@@ -1,6 +1,6 @@
 <template>
   <div class="todo-page">
-    <h1>My Task</h1>
+    <h1>{{ userStore.userProfile?.name }} のタスク</h1>
     <TaskForm @add-task="handleAddTask" />
     <TaskList
       :tasks="tasks"
@@ -15,6 +15,9 @@ import TaskList from '../components/TaskList.vue'
 import TaskForm from '../components/TaskForm.vue'
 import type { Task } from '../types/task'
 import { ref } from 'vue'
+import { useUserStore } from '@/store/useUserStore'
+
+const userStore = useUserStore()
 
 const tasks = ref<Task[]>([
   { id: '1', title: 'タスク1', completed: false },
