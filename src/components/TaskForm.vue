@@ -33,7 +33,7 @@ const titleSchema = yup
 import { computed } from 'vue'
 import { useField } from 'vee-validate'
 
-const { value: title, errorMessage } = useField<string>('title', titleSchema)</script>
+const { value: title, errorMessage } = useField<string>('title', titleSchema)
 
 const emit = defineEmits<{
   (e: 'add-task', title: string): void
