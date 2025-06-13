@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 import type { UserProfile } from '@/types/user'
 
-// LocalStorage キー定数
-const USER_STORAGE_KEY = 'vue-app-user-data'
+
 
 export const useUserStore = defineStore('user', {
   state: () => ({

@@ -1,9 +1,9 @@
 import LoginPage from '@/pages/LoginPage.vue'
 import NotFoundPage from '@/pages/NotFoundPage.vue'
 import TaskDetailPage from '@/pages/TaskDetailPage.vue'
-import TodoPage from '@/pages/TodoPage.vue'
+import TodoView from '@/features/todo/views/TodoView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/store/useUserStore'
+import { useUserStore } from '../shared/stores/useUserStore'
 
 const routes = [
   {
@@ -16,7 +16,7 @@ const routes = [
   },
   {
     path: '/todo',
-    component: TodoPage,
+    component: TodoView,
     meta: {
       requiresAuth: true,
     },
