@@ -1,6 +1,7 @@
 <template>
   <div class="todo-page">
     <h1>My Task</h1>
+    <TaskForm @add-task="handleAddTask" />
     <TaskList
       :tasks="tasks"
       @task-status-updated="handleTaskStatusUpdate"
@@ -11,6 +12,7 @@
 
 <script setup lang="ts">
 import TaskList from '../components/TaskList.vue'
+import TaskForm from '../components/TaskForm.vue'
 import type { Task } from '../types/task'
 import { ref } from 'vue'
 
@@ -35,6 +37,25 @@ function handleTaskStatusUpdate(taskId: string, newStatus: boolean): void {
  */
 function handleTaskDeletion(taskId: string): void {
   tasks.value = tasks.value.filter((task) => task.id !== taskId)
+}
+
+/**
+ * タスクを追加
+ */
+function handleAddTask(title: string): void {
+  // ビジネスロジック層のバリデーション
+  const isDuplicate = tasks.value.some((task) => task.title.toLowerCase() === title.toLowerCase())
+
+  if (isDuplicate) {
+    // 重複エラー処理
+    return
+  }
+
+  tasks.value.push({
+    id: String(Date.now()),
+    title,
+    completed: false,
+  })
 }
 </script>
 

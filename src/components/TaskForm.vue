@@ -1,11 +1,6 @@
 <template>
   <form @submit.prevent="handleSubmit" class="task-form">
-    <input
-      type="text"
-      v-model="title"
-      placeholder="Enter new task"
-      class="task-input"
-    />
+    <input type="text" v-model="title" placeholder="Enter new task" class="task-input" />
     <button type="submit" class="add-task-button">Add Task</button>
   </form>
 </template>
@@ -20,10 +15,18 @@ const emit = defineEmits<{
 }>()
 
 const handleSubmit = () => {
-  if (title.value.trim()) {
-    emit('add-task', title.value.trim())
-    title.value = '' // Clear input after emitting
+  const trimmedTitle = title.value.trim()
+
+  if (!trimmedTitle) {
+    return
   }
+
+  if (trimmedTitle.length > 100) {
+    return
+  }
+
+  emit('add-task', trimmedTitle)
+  title.value = ''
 }
 </script>
 
