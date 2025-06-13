@@ -14,11 +14,10 @@
   </form>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useField } from 'vee-validate'
+<script lang="ts">
 import * as yup from 'yup'
 
+// Define schema outside component to prevent recreation on each render
 const titleSchema = yup
   .string()
   .required('タスクを入力してください')
@@ -28,7 +27,13 @@ const titleSchema = yup
     if (!value) return true
     return value.trim() === value
   })
-const { value: title, errorMessage } = useField<string>('title', titleSchema)
+</script>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useField } from 'vee-validate'
+
+const { value: title, errorMessage } = useField<string>('title', titleSchema)</script>
 
 const emit = defineEmits<{
   (e: 'add-task', title: string): void
