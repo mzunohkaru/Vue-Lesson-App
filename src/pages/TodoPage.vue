@@ -29,9 +29,9 @@ const tasks = ref<Task[]>([
  * タスクの完了状態を更新
  */
 function handleTaskStatusUpdate(taskId: string, newStatus: boolean): void {
-  const taskIndex = tasks.value.findIndex((task) => task.id === taskId)
-  if (taskIndex !== -1) {
-    tasks.value[taskIndex].completed = newStatus
+  const task = tasks.value.find((task) => task.id === taskId)
+  if (task) {
+    task.completed = newStatus
   }
 }
 

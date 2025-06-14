@@ -27,7 +27,7 @@ export const useTodoStore = defineStore('todo', {
       const repository = new InMemoryTaskRepository() as TaskRepository
       this.loading = true
       this.error = null
-      
+
       try {
         this.tasks = await repository.getTasks()
       } catch (error) {
