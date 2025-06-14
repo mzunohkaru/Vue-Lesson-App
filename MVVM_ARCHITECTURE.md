@@ -1,73 +1,73 @@
-# MVVM Architecture Documentation
+# MVVM アーキテクチャ ドキュメント
 
-## Overview
+## 概要
 
-This Vue.js application has been restructured to follow the MVVM (Model-View-ViewModel) architectural pattern, providing clear separation of concerns and improved maintainability.
+この Vue.js アプリケーションは、MVVM（Model-View-ViewModel）アーキテクチャパターンに従って再構築されており、関心事の明確な分離と保守性の向上を提供します。
 
-## Architecture Principles
+## アーキテクチャの原則
 
-### MVVM Pattern
-- **Model**: Data entities and business logic for data access
-- **View**: Pure presentation components with minimal logic
-- **ViewModel**: State management and data transformation using Pinia stores
+### MVVM パターン
+- **Model**: データエンティティとデータアクセスのためのビジネスロジック
+- **View**: 最小限のロジックを持つ純粋なプレゼンテーションコンポーネント
+- **ViewModel**: Pinia ストアを使用したステート管理とデータ変換
 
-### Key Benefits
-- Clear separation of concerns
-- Improved testability
-- Better code organization
-- Enhanced maintainability
-- Scalable architecture
+### 主な利点
+- 関心事の明確な分離
+- テスタビリティの向上
+- より良いコード構成
+- 保守性の向上
+- スケーラブルなアーキテクチャ
 
-## Directory Structure
+## ディレクトリ構造
 
 ```
 src/
-├── features/                    # Feature-first organization
-│   └── todo/                   # Todo feature module
-│       ├── models/             # Model layer - Data entities and repositories
-│       │   ├── TaskModel.ts    # Task entity and repository interface
-│       │   └── TaskRepository.ts # Task data access implementation
-│       ├── viewmodels/         # ViewModel layer - State management
-│       │   └── useTodoStore.ts # Pinia store for todo state
-│       ├── composables/        # Reusable business logic
-│       │   ├── useTaskValidation.ts # Form validation logic
-│       │   └── useTaskOperations.ts # Task operation helpers
-│       └── views/              # View layer - Presentation components
-│           ├── TodoView.vue    # Main todo page component
-│           └── components/     # Feature-specific components
+├── features/                   # 機能優先の構成
+│   └── todo/                   # Todo 機能モジュール
+│       ├── models/             # Model レイヤー - データエンティティとリポジトリ
+│       │   ├── TaskModel.ts    # タスクエンティティとリポジトリインターフェース
+│       │   └── TaskRepository.ts # タスクデータアクセス実装
+│       ├── viewmodels/         # ViewModel レイヤー - ステート管理
+│       │   └── useTodoStore.ts # Todo ステート用 Pinia ストア
+│       ├── composables/        # 再利用可能なビジネスロジック
+│       │   ├── useTaskValidation.ts # フォームバリデーションロジック
+│       │   └── useTaskOperations.ts # タスク操作ヘルパー
+│       └── views/              # View レイヤー - プレゼンテーションコンポーネント
+│           ├── TodoView.vue    # メイン Todo ページコンポーネント
+│           └── components/     # 機能固有のコンポーネント
 │               ├── TaskForm.vue
 │               ├── TaskList.vue
 │               └── TaskItem.vue
-├── shared/                     # Shared utilities and components
-│   ├── stores/                 # Global stores
-│   │   └── useUserStore.ts     # User authentication store
-│   └── types/                  # Shared type definitions
+├── shared/                     # 共有ユーティリティとコンポーネント
+│   ├── stores/                 # グローバルストア
+│   │   └── useUserStore.ts     # ユーザー認証ストア
+│   └── types/                  # 共有型定義
 │       ├── user.ts
 │       └── task.ts
-├── pages/                      # Route-level pages (legacy)
-├── components/                 # Global components (legacy)
-├── types/                      # Global types (legacy)
-└── router/                     # Application routing
+├── pages/                      # ルートレベルのページ（レガシー）
+├── components/                 # グローバルコンポーネント（レガシー）
+├── types/                      # グローバル型（レガシー）
+└── router/                     # アプリケーションルーティング
 ```
 
-## Layer Responsibilities
+## レイヤーの責任
 
-### Model Layer (`src/features/todo/models/`)
+### Model レイヤー (`src/features/todo/models/`)
 
-**Purpose**: Defines data structures and handles data access operations.
+**目的**: データ構造を定義し、データアクセス操作を処理します。
 
-**Components**:
-- `TaskModel.ts`: Defines the Task entity and TaskRepository interface
-- `TaskRepository.ts`: Implements data access operations (CRUD)
+**コンポーネント**:
+- `TaskModel.ts`: Task エンティティと TaskRepository インターフェースを定義
+- `TaskRepository.ts`: データアクセス操作（CRUD）を実装
 
-**Responsibilities**:
-- Data entity definitions
-- Business rules enforcement
-- Data validation at the model level
-- Repository pattern implementation
-- Data persistence abstraction
+**責任**:
+- データエンティティの定義
+- ビジネスルールの実施
+- モデルレベルでのデータ検証
+- リポジトリパターンの実装
+- データ永続化の抽象化
 
-**Example**:
+**例**:
 ```typescript
 // TaskModel.ts
 export interface Task {
@@ -77,27 +77,27 @@ export interface Task {
 }
 
 export class TaskEntity implements Task {
-  // Entity methods for business logic
+  // ビジネスロジック用のエンティティメソッド
   toggleCompletion(): TaskEntity { ... }
   updateTitle(newTitle: string): TaskEntity { ... }
 }
 ```
 
-### ViewModel Layer (`src/features/todo/viewmodels/`)
+### ViewModel レイヤー (`src/features/todo/viewmodels/`)
 
-**Purpose**: Manages application state and coordinates between Model and View layers.
+**目的**: アプリケーションの状態を管理し、Model と View レイヤー間の調整を行います。
 
-**Components**:
-- `useTodoStore.ts`: Pinia store managing todo application state
+**コンポーネント**:
+- `useTodoStore.ts`: Todo アプリケーション状態を管理する Pinia ストア
 
-**Responsibilities**:
-- State management using Pinia
-- Coordinating Model operations
-- Exposing computed properties for Views
-- Error handling and loading states
-- Business logic orchestration
+**責任**:
+- Pinia を使用したステート管理
+- Model 操作の調整
+- View 用の計算プロパティの公開
+- エラーハンドリングとローディング状態
+- ビジネスロジックのオーケストレーション
 
-**Example**:
+**例**:
 ```typescript
 // useTodoStore.ts
 export const useTodoStore = defineStore('todo', {
@@ -119,30 +119,30 @@ export const useTodoStore = defineStore('todo', {
 })
 ```
 
-### View Layer (`src/features/todo/views/`)
+### View レイヤー (`src/features/todo/views/`)
 
-**Purpose**: Pure presentation components focused on user interface.
+**目的**: ユーザーインターフェースに焦点を当てた純粋なプレゼンテーションコンポーネント。
 
-**Components**:
-- `TodoView.vue`: Main container component
-- `components/TaskForm.vue`: Task input form
-- `components/TaskList.vue`: Task collection display
-- `components/TaskItem.vue`: Individual task component
+**コンポーネント**:
+- `TodoView.vue`: メインコンテナコンポーネント
+- `components/TaskForm.vue`: タスク入力フォーム
+- `components/TaskList.vue`: タスクコレクション表示
+- `components/TaskItem.vue`: 個別タスクコンポーネント
 
-**Responsibilities**:
-- User interface rendering
-- User interaction handling
-- Consuming ViewModel state
-- Minimal presentation logic only
-- Event emission to ViewModels
+**責任**:
+- ユーザーインターフェースのレンダリング
+- ユーザーインタラクションの処理
+- ViewModel 状態の消費
+- 最小限のプレゼンテーションロジックのみ
+- ViewModel へのイベント発行
 
-**Example**:
+**例**:
 ```vue
 <!-- TaskForm.vue -->
 <template>
   <form @submit.prevent="handleSubmit">
     <input v-model="title" :class="{ error: hasError }" />
-    <button :disabled="hasError || todoStore.loading">Add Task</button>
+    <button :disabled="hasError || todoStore.loading">タスクを追加</button>
   </form>
 </template>
 
@@ -157,53 +157,53 @@ const todoStore = useTodoStore()
 
 ### Composables (`src/features/todo/composables/`)
 
-**Purpose**: Reusable business logic and utilities.
+**目的**: 再利用可能なビジネスロジックとユーティリティ。
 
-**Components**:
-- `useTaskValidation.ts`: Form validation logic
-- `useTaskOperations.ts`: Task operation helpers
+**コンポーネント**:
+- `useTaskValidation.ts`: フォームバリデーションロジック
+- `useTaskOperations.ts`: タスク操作ヘルパー
 
-**Responsibilities**:
-- Reusable business logic
-- Form validation
-- Computed properties
-- Event handlers
-- Utility functions
+**責任**:
+- 再利用可能なビジネスロジック
+- フォームバリデーション
+- 計算プロパティ
+- イベントハンドラー
+- ユーティリティ関数
 
-## Data Flow
+## データフロー
 
-### Unidirectional Data Flow
-1. **View** triggers user actions (form submission, button clicks)
-2. **ViewModel** (Pinia store) receives actions and coordinates business logic
-3. **Model** performs data operations and enforces business rules
-4. **ViewModel** updates reactive state based on Model results
-5. **View** automatically re-renders based on ViewModel state changes
+### 単方向データフロー
+1. **View** がユーザーアクション（フォーム送信、ボタンクリック）をトリガー
+2. **ViewModel**（Pinia ストア）がアクションを受け取り、ビジネスロジックを調整
+3. **Model** がデータ操作を実行し、ビジネスルールを適用
+4. **ViewModel** が Model の結果に基づいてリアクティブ状態を更新
+5. **View** が ViewModel の状態変更に基づいて自動的に再レンダリング
 
-### Example Flow: Adding a Task
+### 例: タスク追加のフロー
 ```
-1. User types in TaskForm (View)
-2. Form validation via useTaskValidation composable
-3. Form submission calls todoStore.addTask() (ViewModel)
-4. Store calls repository.addTask() (Model)
-5. Model validates and creates task entity
-6. Repository updates data and returns result
-7. Store updates reactive state
-8. TaskList component re-renders automatically (View)
+1. ユーザーが TaskForm に入力（View）
+2. useTaskValidation composable によるフォームバリデーション
+3. フォーム送信が todoStore.addTask() を呼び出し（ViewModel）
+4. ストアが repository.addTask() を呼び出し（Model）
+5. Model がタスクエンティティを検証・作成
+6. リポジトリがデータを更新し結果を返す
+7. ストアがリアクティブ状態を更新
+8. TaskList コンポーネントが自動的に再レンダリング（View）
 ```
 
-## Migration Guide
+## 移行ガイド
 
-### From Old Architecture
-The previous architecture had all business logic embedded in `TodoPage.vue`:
+### 旧アーキテクチャからの移行
+以前のアーキテクチャでは、すべてのビジネスロジックが `TodoPage.vue` に埋め込まれていました：
 
-**Before**:
+**Before（移行前）**:
 ```vue
 <!-- TodoPage.vue -->
 <script setup lang="ts">
 const tasks = ref<Task[]>([...])
 
 function handleAddTask(title: string): void {
-  // Business logic mixed with component
+  // ビジネスロジックがコンポーネントと混在
   const isDuplicate = tasks.value.some(...)
   if (isDuplicate) return
   tasks.value.push({ id: String(Date.now()), title, completed: false })
@@ -211,87 +211,87 @@ function handleAddTask(title: string): void {
 </script>
 ```
 
-**After**:
+**After（移行後）**:
 ```vue
 <!-- TodoView.vue -->
 <script setup lang="ts">
 import { useTodoStore } from '../viewmodels/useTodoStore'
 
 const todoStore = useTodoStore()
-// Business logic now in ViewModel (Pinia store)
-// Component focuses only on presentation
+// ビジネスロジックは現在 ViewModel（Pinia ストア）にある
+// コンポーネントはプレゼンテーションのみに焦点
 </script>
 ```
 
-### Key Changes
-1. **State Management**: Moved from local component state to Pinia stores
-2. **Business Logic**: Extracted to composables and repository classes
-3. **Validation**: Separated into dedicated composables
-4. **Data Access**: Abstracted behind repository interfaces
-5. **Component Responsibility**: Reduced to pure presentation logic
+### 主な変更点
+1. **ステート管理**: ローカルコンポーネント状態から Pinia ストアへ移行
+2. **ビジネスロジック**: composables とリポジトリクラスに抽出
+3. **バリデーション**: 専用の composables に分離
+4. **データアクセス**: リポジトリインターフェースの背後に抽象化
+5. **コンポーネントの責任**: 純粋なプレゼンテーションロジックに削減
 
-## Best Practices
+## ベストプラクティス
 
-### Model Layer
-- Keep entities immutable where possible
-- Implement business rules in entity methods
-- Use repository pattern for data access
-- Abstract external dependencies
+### Model レイヤー
+- 可能な限りエンティティを不変にする
+- エンティティメソッドでビジネスルールを実装
+- データアクセスにリポジトリパターンを使用
+- 外部依存関係を抽象化
 
-### ViewModel Layer
-- Use Pinia stores for state management
-- Implement proper error handling
-- Provide loading states for async operations
-- Keep computed properties pure
+### ViewModel レイヤー
+- ステート管理に Pinia ストアを使用
+- 適切なエラーハンドリングを実装
+- 非同期操作にローディング状態を提供
+- 計算プロパティを純粋に保つ
 
-### View Layer
-- Focus on presentation only
-- Use composables for reusable logic
-- Emit events rather than calling methods directly
-- Keep templates declarative
+### View レイヤー
+- プレゼンテーションのみに焦点
+- 再利用可能なロジックに composables を使用
+- メソッドを直接呼び出すのではなくイベントを発行
+- テンプレートを宣言的に保つ
 
 ### Composables
-- Make them focused and reusable
-- Return reactive references
-- Handle cleanup properly
-- Document expected usage
+- 焦点を絞って再利用可能にする
+- リアクティブ参照を返す
+- クリーンアップを適切に処理
+- 使用方法を文書化
 
-## Testing Strategy
+## テスト戦略
 
-### Model Testing
-- Unit test entity business logic
-- Mock repository implementations
-- Test data validation rules
-- Verify error handling
+### Model テスト
+- エンティティビジネスロジックの単体テスト
+- リポジトリ実装のモック
+- データバリデーションルールのテスト
+- エラーハンドリングの検証
 
-### ViewModel Testing
-- Test Pinia store actions and getters
-- Mock repository dependencies
-- Verify state transitions
-- Test error scenarios
+### ViewModel テスト
+- Pinia ストアアクションとゲッターのテスト
+- リポジトリ依存関係のモック
+- 状態遷移の検証
+- エラーシナリオのテスト
 
-### View Testing
-- Test component rendering
-- Verify user interactions
-- Mock ViewModel dependencies
-- Test accessibility features
+### View テスト
+- コンポーネントレンダリングのテスト
+- ユーザーインタラクションの検証
+- ViewModel 依存関係のモック
+- アクセシビリティ機能のテスト
 
-## Future Enhancements
+## 今後の拡張
 
-### Potential Improvements
-1. **API Integration**: Replace InMemoryRepository with HTTP-based repository
-2. **Caching**: Add caching layer in repository
-3. **Optimistic Updates**: Implement optimistic UI updates
-4. **Real-time Updates**: Add WebSocket support for real-time task updates
-5. **Offline Support**: Implement offline-first architecture
-6. **Advanced Validation**: Add server-side validation integration
+### 改善の可能性
+1. **API 統合**: InMemoryRepository を HTTP ベースのリポジトリに置き換え
+2. **キャッシュ**: リポジトリにキャッシュレイヤーを追加
+3. **楽観的更新**: 楽観的 UI 更新の実装
+4. **リアルタイム更新**: リアルタイムタスク更新のための WebSocket サポート追加
+5. **オフラインサポート**: オフラインファーストアーキテクチャの実装
+6. **高度なバリデーション**: サーバーサイドバリデーション統合の追加
 
-### Scalability Considerations
-- Feature modules can be easily added following the same pattern
-- Shared utilities can be extracted to separate packages
-- Repository implementations can be swapped without affecting other layers
-- State management can be extended with additional stores
+### スケーラビリティの考慮事項
+- 同じパターンに従って機能モジュールを簡単に追加可能
+- 共有ユーティリティを別パッケージに抽出可能
+- 他のレイヤーに影響を与えることなくリポジトリ実装を交換可能
+- 追加ストアでステート管理を拡張可能
 
-## Conclusion
+## 結論
 
-The MVVM architecture provides a solid foundation for the Vue.js application with clear separation of concerns, improved testability, and better maintainability. The feature-first organization makes it easy to understand and extend the codebase while following Vue.js best practices.
+MVVM アーキテクチャは、関心事の明確な分離、テスタビリティの向上、保守性の向上を伴う Vue.js アプリケーションの堅実な基盤を提供します。機能優先の構成により、Vue.js のベストプラクティスに従いながら、コードベースを理解し拡張することが容易になります。

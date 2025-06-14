@@ -21,7 +21,7 @@
       class="delete-btn"
       :aria-label="`タスク「${title}」を削除`"
       :disabled="!canDelete"
-      :title="isCompleted ? 'タスクを削除' : '完了済みタスクのみ削除可能'"
+      :title="canDelete ? 'タスクを削除' : '完了済みタスクのみ削除可能'"
     >
       <svg
         width="16"
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { useTaskOperations } from '../../composables/useTaskOperations'
+import { computed } from 'vue'
 
 type TaskItemProps = {
   taskId: string
@@ -55,14 +56,17 @@ const props = defineProps<TaskItemProps>()
 const {
   taskItemClasses: createTaskItemClasses,
   taskTitleClasses: createTaskTitleClasses,
-  canDeleteTask,
   handleTaskStatusUpdate,
   handleTaskDeletion,
 } = useTaskOperations()
 
 const taskItemClasses = createTaskItemClasses(props.isCompleted)
 const taskTitleClasses = createTaskTitleClasses(props.isCompleted)
-const canDelete = canDeleteTask(props.isCompleted)
+
+const canDelete = computed(() => {
+  console.log('canDelete', props.isCompleted)
+  return props.isCompleted
+})
 
 function handleDeletionRequest(): void {
   handleTaskDeletion(props.taskId, props.isCompleted)

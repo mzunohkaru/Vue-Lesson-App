@@ -13,10 +13,8 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   async addTask(title: string): Promise<Task> {
-    const existingTask = this.tasks.find(
-      task => task.title.toLowerCase() === title.toLowerCase()
-    )
-    
+    const existingTask = this.tasks.find((task) => task.title.toLowerCase() === title.toLowerCase())
+
     if (existingTask) {
       throw new Error('重複するタスクは追加できません')
     }
@@ -27,8 +25,8 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   async updateTask(id: string, updates: Partial<Omit<Task, 'id'>>): Promise<Task> {
-    const taskIndex = this.tasks.findIndex(task => task.id === id)
-    
+    const taskIndex = this.tasks.findIndex((task) => task.id === id)
+
     if (taskIndex === -1) {
       throw new Error('タスクが見つかりません')
     }
@@ -38,8 +36,8 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   async deleteTask(id: string): Promise<void> {
-    const task = this.tasks.find(t => t.id === id)
-    
+    const task = this.tasks.find((t) => t.id === id)
+
     if (!task) {
       throw new Error('タスクが見つかりません')
     }
@@ -48,10 +46,10 @@ export class InMemoryTaskRepository implements TaskRepository {
       throw new Error('完了済みタスクのみ削除可能です')
     }
 
-    this.tasks = this.tasks.filter(task => task.id !== id)
+    this.tasks = this.tasks.filter((task) => task.id !== id)
   }
 
   async findTaskById(id: string): Promise<Task | null> {
-    return this.tasks.find(task => task.id === id) || null
+    return this.tasks.find((task) => task.id === id) || null
   }
 }
