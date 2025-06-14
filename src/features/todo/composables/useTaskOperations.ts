@@ -12,8 +12,6 @@ export function useTaskOperations() {
     'task-title--completed': isCompleted,
   }))
 
-  const canDeleteTask = (isCompleted: boolean) => computed(() => isCompleted)
-
   const handleTaskStatusUpdate = async (taskId: string, newStatus: boolean) => {
     try {
       await todoStore.updateTaskStatus(taskId, newStatus)
@@ -47,7 +45,6 @@ export function useTaskOperations() {
   return {
     taskItemClasses,
     taskTitleClasses,
-    canDeleteTask,
     handleTaskStatusUpdate,
     handleTaskDeletion,
     handleAddTask,
