@@ -10,23 +10,30 @@
       />
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     </div>
-    <button type="submit" class="add-task-button" :disabled="hasError">Add Task</button>
+    <button type="submit" class="add-task-button" :disabled="hasError || todoStore.loading">
+      {{ todoStore.loading ? 'Adding...' : 'Add Task' }}
+    </button>
   </form>
 </template>
 
 <script setup lang="ts">
-import { useTaskValidation } from '@/features/todo/composables/useTaskValidation'
+import { useTaskValidation } from '../../composables/useTaskValidation'
+import { useTaskOperations } from '../../composables/useTaskOperations'
+import { useTodoStore } from '../../viewmodels/useTodoStore'
 
 const { title, errorMessage, hasError, resetField } = useTaskValidation()
+const { handleAddTask } = useTaskOperations()
+const todoStore = useTodoStore()
 
-const emit = defineEmits<{
-  (e: 'add-task', title: string): void
-}>()
-
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (hasError.value) return
-  emit('add-task', title.value)
-  resetField()
+  
+  try {
+    await handleAddTask(title.value)
+    resetField()
+  } catch (error) {
+    console.error('Failed to add task:', error)
+  }
 }
 </script>
 
